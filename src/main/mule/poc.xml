@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ede92dc7-faae-49c1-ab50-36e6f67fbdfb" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="77088e8d-fe9a-4b95-b234-9b6ce885a5fc" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" database="test" />
+	</db:config>
+	<flow name="pocFlow" doc:id="375a0257-c4e1-4605-9d58-ca4fab2b90f6" >
+		<scheduler doc:name="Scheduler" doc:id="972ef719-fa19-4bbe-a4e4-784482c634d1" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="DAYS" startDelay="10"/>
+			</scheduling-strategy>
+		</scheduler>
+		<db:select doc:name="Select" doc:id="6e187db6-8d57-4e78-930f-6057619818f2" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from accounts]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="69397ae4-2c3f-4433-abeb-13784b61cce7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6c7fa95a-1e5b-42ff-8c8a-455fa15be473" message="#[payload]"/>
+	</flow>
+	<flow name="pocFlow1" doc:id="5c996717-659e-4d71-8ff0-67a6e9c0ab33" >
+		<http:listener doc:name="Listener" doc:id="f179375e-b332-4409-bcda-f0114ed71027" config-ref="HTTP_Listener_config" path="/select"/>
+		<db:select doc:name="Select" doc:id="78d0eae3-2840-44b4-aa90-570959274fea" config-ref="Database_Config1">
+			<db:sql ><![CDATA[select * from product]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="34c9fb7b-3dfd-4e11-a701-3665fe807aa7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6c22ba2d-93d5-4c80-92b9-aa5f943749cd" />
+	</flow>
+	<flow name="pocFlow2" doc:id="c9ae2539-486d-493c-a0c9-504e220ac17b" >
+		<http:listener doc:name="Listener" doc:id="6ec5eeac-0e3d-432f-81e9-d68622659436" config-ref="HTTP_Listener_config" path="/update" allowedMethods="PUT"/>
+		<logger level="INFO" doc:name="Logger" doc:id="68c38c64-4ff5-4376-bada-a37c6eef2769" message="#[payload]"/>
+		<db:update doc:name="Update" doc:id="aaa7e649-a94a-467f-957f-a71cd6ef243c" config-ref="Database_Config1">
+			<db:sql ><![CDATA[UPDATE product SET productID=:productID,productName=:productName,sellerName=:sellerName,sellerAddress=:sellerAddress WHERE ID=:ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	ID:payload.ID,
+	productID:payload.productID,
+	productName:payload.productName,
+	sellerName:payload.sellerName,
+	sellerAddress:payload.sellerAddress
+	
+	
+}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="ba851c87-6dce-47f0-a33e-6f96c70b3624" message="#[payload]"/>
+	</flow>
+	<flow name="pocFlow3" doc:id="4fd25a18-2ef0-43c8-b0d4-c995d83456cf" >
+		<http:listener doc:name="Listener" doc:id="41266d60-11f8-4605-b3e6-4b51b1c89dc2" config-ref="HTTP_Listener_config" path="/insert"/>
+		<logger level="INFO" doc:name="Logger" doc:id="89874142-23fb-4e02-914d-faef405f8be8" message="#[payload]"/>
+		<db:insert doc:name="Insert" doc:id="e10693cd-0257-4dac-b8d1-8e7f84447025" config-ref="Database_Config1">
+			<db:sql ><![CDATA[INSERT INTO product( productID, productName, sellerName, sellerAddress) VALUES (:productID,:productName,:sellerName,:sellerAddress)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	ID:payload.ID,
+	productID:payload.productID,
+	productName:payload.productName,
+	sellerName:payload.sellerName,
+	sellerAddress:payload.sellerAddress
+	
+	
+}]]]></db:input-parameters>
+		</db:insert>
+	</flow>
+	<flow name="pocFlow4" doc:id="93123584-057d-4bc4-9e8e-0f526ff6227f" >
+		<http:listener doc:name="Listener" doc:id="fcb3b5f5-4bbf-4b4b-8f8d-def006371c60" config-ref="HTTP_Listener_config" path="/delete/{ID}" allowedMethods="DELETE"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6e838429-7ddb-404d-8947-7901df17ff0e" message="#[payload]"/>
+		<db:delete doc:name="Delete" doc:id="31f7cc9a-26fa-4d9b-95dd-77cc3cef61fe" config-ref="Database_Config1">
+			<db:sql ><![CDATA[delete from product where ID=:ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	ID:attributes.uriParams.ID
+}]]]></db:input-parameters>
+		</db:delete>
+	</flow>
+</mule>
