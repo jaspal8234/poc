@@ -33,6 +33,7 @@
 				<configuration>
 				
   				<cloudHubDeployment>
+				<server>${server}</server>
   				<username>${username}</username>
   				<password>${password}</password>
   				<environment>${environment}</environment>
