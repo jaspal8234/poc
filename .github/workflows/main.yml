@@ -90,8 +90,14 @@ jobs:
     - name: Deploy to Sandbox
      
       env:
-	USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
-	PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
+	USERNAME: jaspal8231
+	PASSWORD: Qwerty7***
       run: |
-	artifactName=$(ls *.jar | head -1)
-	mvn package deploy -DmuleDeploy -Danypoint.env=Sandbox -Dapplication.name=github-ci-cd-test -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}  Dmule.version=4.3.0 -Dworkers=1 -Dworker.type=Micro
+        artifactName=$(ls *.jar | head -1)
+        mvn deploy -DmuleDeploy \
+         -Dmule.artifact=$artifactName \
+         -Danypoint.username="$USERNAME" \
+         -Danypoint.password="$PASSWORD" \
+         -Denv=Sandbox \
+         
+         -DskipTests
