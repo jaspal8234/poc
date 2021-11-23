@@ -1,13 +1,9 @@
 name: Manual workflow
 
 on:
-  workflow_dispatch:
+  path:
     branches: [main]
-    inputs:
-      name:
-	description: 'prod deployment ?'
-	default: 'yes'
-	required: true
+  workflow_dispatch:
 
 jobs:
   build:
