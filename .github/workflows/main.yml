@@ -79,7 +79,7 @@ jobs:
     
     - name: Deploy to Sandbox
       env:
-        USERNAME: jaspaal8231
+        USERNAME: jaspal8231
         PASSWORD: Qwerty7***
       run: |
         artifactName=$(ls *.jar | head -1)
