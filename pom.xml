@@ -32,17 +32,20 @@
 				<extensions>true</extensions>
 				<configuration>
 				
+  				
   				<cloudHubDeployment>
-				<server>${server}</server>
-  				<username>${username}</username>
-  				<password>${password}</password>
-  				<environment>${environment}</environment>
-  				<applicationName>${application.name}</applicationName>
-  				<muleVersion>${mule.version}</muleVersion>
-  				<workers>${workers}</workers>
-  				<workerType>${worker.Type}</workerType>
+  				<uri>https://anypoint.mulesoft.com</uri>
+  				<muleVersion>4.3.0</muleVersion>
+  				<username>${anypoint.username}</username>
+  				<password>${anypoint.password}</password>
+  				<applicationName>mule-app-cicd-github</applicationName>
+  				<environment>Sandbox</environment>
+  				<workerType>MICRO</workerType>
+  				<region>us-east-2</region>
+  				<workers>1</workers>
   				<objectStoreV2>true</objectStoreV2>
   				</cloudHubDeployment>
+  				
   				
 					<sharedLibraries>
 						<sharedLibrary>
