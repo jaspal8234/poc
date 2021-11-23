@@ -29,16 +29,6 @@ jobs:
       with:
         java-version: 1.8
     
-    - name: Add repo credentials
-      uses: s4u/maven-settings-action@v2.4.0
-      with:
-        servers: |
-          [{
-           "id": "mule-enterprise",
-           "username": "${{ secrets.mule_nexus_username }}",
-           "password": "${{ secrets.mule_nexus_password }}"
-          }]
-    
     - name: Print effective-settings (optional)
       run: mvn help:effective-settings
     
@@ -88,16 +78,13 @@ jobs:
         name: artifacts
     
     - name: Deploy to Sandbox
-     
       env:
-	USERNAME: jaspal8231
-	PASSWORD: Qwerty7***
+        USERNAME: jaspaal8231
+        PASSWORD: Qwerty7***
       run: |
         artifactName=$(ls *.jar | head -1)
         mvn deploy -DmuleDeploy \
          -Dmule.artifact=$artifactName \
          -Danypoint.username="$USERNAME" \
          -Danypoint.password="$PASSWORD" \
-         -Denv=Sandbox \
-         
          -DskipTests
